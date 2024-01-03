@@ -1,0 +1,42 @@
+#!/bin/bash
+
+
+# Set the backup folder path
+folder_name="/home/ec2-user/DBbackups/"
+
+
+# Set the backup file name components
+file="backupStorage"
+now=$(date +"%b%d-%Y-%H%M%S")
+ext=".gzip"
+file_name="$file$now$ext"
+backupPath="$folder_name$file_name"
+
+
+echo "Backup file path: $backupPath"
+
+
+# Perform the database backup
+mongodump --db mybackupDB --archive="$backupPath" --gzip
+
+
+# Check if the backup was successful
+if [ $? -eq 0 ]; then
+    echo "MongoDB backup successful."
+    
+    # Copy the backup to an S3 bucket (replace 'your-s3-bucket-name' with your actual bucket name)
+    aws s3 cp "$backupPath" s3://your-s3-bucket-name/
+    
+    # Check if the S3 upload was successful
+    if [ $? -eq 0 ]; then
+        echo "Backup uploaded to S3 successfully."
+        
+        # Remove the local backup file
+        rm "$backupPath"
+        echo "Local backup file removed."
+    else
+        echo "Error: Failed to upload the backup to S3."
+    fi
+else
+    echo "Error: MongoDB backup failed."
+fi
