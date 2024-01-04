@@ -46,6 +46,3 @@ fi
 
 
 
-
-acc key-AKIAZ46ARLL7PXWUZMPO
-sackey-QVBKY5GfSHRawJ9Zvatz2iU4sGtXJ+S9bDHIlp/r
